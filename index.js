@@ -24,4 +24,26 @@ const { startServer } = require("./controllers/user.controller");
 app.use("/user", userRoute);
 // app.use("/info", infoRoute);
 
-app.listen(PORT, startServer);
+let connection = app.listen(PORT, startServer);
+
+let socketServer = require("socket.io");
+let io = socketServer(connection, {
+  cors : {origin: "*"}
+})
+
+io.on("connection", (socket) => {
+  console.log("Socket connected");
+  console.log(socket.id);
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected");
+  })
+
+  socket.on("sentMsg", (result)=>{
+    console.log(result);
+    io.emit("broadcast", result)
+  })
+
+
+})
+
+
